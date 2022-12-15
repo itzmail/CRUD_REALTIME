@@ -1,0 +1,26 @@
+GET http://localhost:5000/api/products
+
+###
+GET http://localhost:5000/api/products/1
+
+###
+POST http://localhost:5000/api/products
+Content-Type: application/json
+
+{
+    "name": "Product 5",
+    "price": 1234
+}
+
+###
+POST http://localhost:5000/api/products/2
+Content-Type: application/json
+
+{
+    "name": "Rozak Manzar",
+    "price": 345,
+    "_method": "put"
+}
+
+###
+DELETE http://localhost:5000/api/products/4
