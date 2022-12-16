@@ -50,7 +50,7 @@ const ProductList = () => {
                   <td className="py-3 px-6 font-medium text-gray-900">{value?.name || "#_ERROR"}</td>
                   <td className="py-3 px-6">{value?.price || "#_ERROR"}</td>
                   <td className="py-3 px-1 text-center">
-                    <Link to={`/edit/${value.id}`} className={"font-medium bg-blue-400 hover:bg-blue-500 px-3 py-1 rounded text-white mr-1"}>Edit</Link>
+                    <Link to={`/update/${value.id}`} className={"font-medium bg-blue-400 hover:bg-blue-500 px-3 py-1 rounded text-white mr-1"}>Edit</Link>
                     <button onClick={(e) => deleteProduct(e, value.id)} className="font-medium bg-red-400 hover:bg-red-500 px-3 py-1 rounded text-white mr-1">Delete</button>
                   </td>
                 </tr>

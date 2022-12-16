@@ -1,41 +1,71 @@
+import { useState, useEffect } from "react"
 import axios from "axios"
-import { useState } from "react"
+import { useParams } from 'react-router-dom';
+import { FormInput } from "./AddNewProduct";
 
-const AddNewProduct = () => {
+const UpdateProduct = () => {
     const [name, setName] = useState("");
     const [price, setPrice] = useState(0);
-    const [isError, setIsError] = useState(false);
     const [respond, setRespond] = useState(null);
+    const [idItem, setIdItem] = useState(null);
+    const [isError, setIsError] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
+    const [dataGet, setDataGet] = useState(null);
+
+    const params = useParams();
+
+    useEffect(() => {
+        getFirstData();
+    }, [])
+
+    function getFirstData() {
+        console.log(`Params`, params);
+        if (params) {
+            setIdItem(params?.id);
+            axios.get(`http://localhost:5000/api/products/${params?.id}`)
+                .then(res => {
+                    const status = res.data?.status;
+                    const data = res.data?.data;
+                    console.log(res.data)
+                    if (status === 'success') {
+                        setDataGet(data);
+                        setName(data?.name);
+                        setPrice(data?.price);
+                    }
+                })
+                .catch(err => console.log(`Error`, err))
+        }
+    }
 
     function sendData(e) {
+        console.log(`Format`, { name, price, method: '_put' })
         e.preventDefault();
         setIsLoading(true);
         if (name && price) {
             // axios.post('http://localhost:5000/api/products', { name, price })
             axios({
                 method: 'post',
-                url: 'http://localhost:5000/api/products',
+                url: `http://localhost:5000/api/products/${idItem}`,
                 headers: {
                     "Content-Type": "application/x-www-form-urlencoded"
                 },
-                data: { name, price }
+                data: { name, price, method: '_put' }
             }).then(res => {
                 console.log(res);
-                if(res.data?.status === 'success') {
+                if (res.data?.status === 'success') {
                     setIsError(false);
                 } else {
-                    setIsError(true)    
+                    setIsError(true)
                 }
                 setIsLoading(false);
                 setRespond(res.data);
             })
-            .catch(err => {
-                console.log(`Error Send`, err.message);
-                setIsError(true);
-                setIsLoading(false);
-            });
-                
+                .catch(err => {
+                    console.log(`Error Send`, err.message);
+                    setIsError(true);
+                    setIsLoading(false);
+                });
+
         }
     }
 
@@ -48,13 +78,15 @@ const AddNewProduct = () => {
                     </div>
                 )}
                 <div className="bg-slate-100 w-full shadow-md rounded-md p-4">
-                    <div className="flex w-full justify-center">
-                        <h2 className="text-xl font-semibold">Add New Product</h2>
+                    <div className="flex w-full justify-center mb-5">
+                        <h2 className="text-xl font-semibold">Update Product {dataGet?.name}</h2>
                     </div>
                     <form onSubmit={sendData}>
-                        <FormInput type={'text'} onChange={e => setName(e.target.value)} label={'Nama Produk : '} placeholder={"Nama Produk Baru"} />
-                        <FormInput type={'number'} onChange={e => setPrice(e.target.value)} label={'Harga Produk : '} placeholder={"Harga Produk Baru"} />
-                        <button type="submit" className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" disabled={isLoading}>{isLoading ? 'Loading...' : 'Add Product'}</button>
+                        <FormInput type={'text'} onChange={e => setName(e.target.value)} label={'Nama Produk : '} placeholder={"Nama Produk Baru"} value={name} />
+                        <FormInput type={'number'} onChange={e => setPrice(e.target.value)} label={'Harga Produk : '} placeholder={"Harga Produk Baru"} value={price} />
+                        <button type="submit" className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" disabled={isLoading}>
+                            {isLoading ? 'Loading...' : 'Edit Product'}
+                        </button>
                     </form>
                 </div>
             </div>
@@ -62,13 +94,4 @@ const AddNewProduct = () => {
     )
 }
 
-const FormInput = ({ label, onChange, type, placeholder, isRequired }) => {
-    return (
-        <div className="mb-6">
-            <label className="block mb-2 text-sm font-medium text-gray-900">{label}</label>
-            <input type={type} className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" placeholder={placeholder} required={isRequired} onChange={onChange} />
-        </div>
-    )
-}
-
-export default AddNewProduct;
+export default UpdateProduct;
